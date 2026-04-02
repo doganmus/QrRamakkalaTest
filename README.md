@@ -61,3 +61,11 @@ Zorunlu olarak ek bir analiz dokümanı gerekmiyor. Ancak riski düşürmek içi
 
 ## Not
 Bu repoda başlangıç olarak analiz ve planlama dokümanları yer alır. Kod geliştirme fazı için backlog `docs/project-plan.md` içindeki Jira planına göre yürütülmelidir.
+
+## EPIC-1 Teknik Skeleton (Bu Repoda Oluşturuldu)
+- `backend/` : Express tabanlı API skeleton + `/api/v1/health`
+- `frontend/` : Nginx ile servis edilen minimal arayüz
+- `db/migrations/001_init.sql` : ilk migration (users/roles/user_roles)
+- `docker-compose.yml` : postgres + backend + frontend
+- `.env.example` : ortam değişkeni örneği
+- `.github/workflows/ci.yml` : backend lint/build + compose doğrulama

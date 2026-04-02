@@ -463,3 +463,28 @@ Cevap: **Evet, başlanabilir.** EPIC-1 tamamlandığında ekip paralel feature g
 - LDAP/AD erişim topolojisi ve güvenlik kuralları
 - KVKK saklama sürelerinin kurum içi son onayı
 - Pilot lokasyon, UAT kullanıcıları ve başarı metrikleri
+
+---
+
+## 10) EPIC-1 Teknik Skeleton Çıktıları (Repo Durumu)
+
+Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar oluşturulmuştur:
+
+- `backend/src/index.js`
+  - Express API skeleton
+  - `GET /api/v1/health` endpointi
+  - PostgreSQL bağlantı kontrolü
+- `backend/Dockerfile` ve `backend/package.json`
+  - Konteynerize backend koşumu
+  - lint/build scriptleri
+- `frontend/index.html` ve `frontend/nginx.conf`
+  - Minimal frontend iskeleti
+  - `/api/*` çağrıları için backend proxy
+- `db/migrations/001_init.sql`
+  - İlk migration (users, roles, user_roles)
+- `docker-compose.yml`
+  - postgres + backend + frontend birlikte ayağa kaldırma
+- `.env.example`
+  - Ortam değişkeni şablonu
+- `.github/workflows/ci.yml`
+  - Backend lint/build + docker compose config doğrulaması
