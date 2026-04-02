@@ -1,0 +1,29 @@
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL PRIMARY KEY,
+  full_name VARCHAR(200) NOT NULL,
+  phone VARCHAR(30),
+  email VARCHAR(255),
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+  id BIGSERIAL PRIMARY KEY,
+  code VARCHAR(50) UNIQUE NOT NULL,
+  name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_roles (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role_id BIGINT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+  UNIQUE (user_id, role_id)
+);
+
+INSERT INTO roles (code, name)
+VALUES
+  ('SUPER_ADMIN', 'Süper Admin'),
+  ('EHS_EXPERT', 'İSG Uzmanı'),
+  ('LOCATION_MANAGER', 'Lokasyon Sorumlusu'),
+  ('VIEWER', 'İzleyici')
+ON CONFLICT (code) DO NOTHING;
