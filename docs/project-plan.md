@@ -368,6 +368,7 @@
 - [x] **EPIC-1** Altyapı ve Proje Kurulumu (**Tamamlandı**)
 - [x] **EPIC-2** Kimlik ve Yetkilendirme temel iskelet (**Tamamlandı**)
 - [x] **EPIC-3** QR ve Lokasyon temel iskelet (**Tamamlandı**)
+- [ ] **EPIC-3** QR ve Lokasyon
 - [ ] **EPIC-4** Bildirim Formu
 - [ ] **EPIC-5** Medya Yönetimi
 - [ ] **EPIC-6** Risk ve Workflow
