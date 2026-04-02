@@ -364,13 +364,27 @@
 
 ## 7) MVP Jira İş Planı (Örnek Backlog)
 
+## 7.0 Aşama Takip Durumu
+- [x] **EPIC-1** Altyapı ve Proje Kurulumu (**Tamamlandı**)
+- [x] **EPIC-2** Kimlik ve Yetkilendirme temel iskelet (**Tamamlandı**)
+- [ ] **EPIC-3** QR ve Lokasyon
+- [ ] **EPIC-4** Bildirim Formu
+- [ ] **EPIC-5** Medya Yönetimi
+- [ ] **EPIC-6** Risk ve Workflow
+- [ ] **EPIC-7** DÖF ve Bildirimler
+- [ ] **EPIC-8** Dashboard ve Raporlama
+- [ ] **EPIC-9** Uyumluluk ve Audit
+- [ ] **EPIC-10** UAT ve Canlıya Hazırlık
+
 ## EPIC-1 Altyapı ve Proje Kurulumu
+Durum: ✅ Tamamlandı (skeleton oluşturuldu)
 - ISG-1 Repo ve monorepo yapısının oluşturulması
 - ISG-2 CI/CD pipeline temel akış
 - ISG-3 Docker Compose ile local ortam
 - ISG-4 Temel loglama ve sağlık kontrolleri
 
 ## EPIC-2 Kimlik ve Yetkilendirme
+Durum: ✅ Tamamlandı (Auth/OTP + RBAC temel endpointleri eklendi)
 - ISG-10 Admin login ve session yönetimi
 - ISG-11 OTP request/verify servisleri
 - ISG-12 Role modeli ve temel RBAC
@@ -482,9 +496,18 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
   - `/api/*` çağrıları için backend proxy
 - `db/migrations/001_init.sql`
   - İlk migration (users, roles, user_roles)
+- `db/migrations/002_auth_otp_rbac.sql`
+  - OTP ve auth session tabloları (EPIC-2 hazırlığı)
 - `docker-compose.yml`
   - postgres + backend + frontend birlikte ayağa kaldırma
 - `.env.example`
   - Ortam değişkeni şablonu
 - `.github/workflows/ci.yml`
   - Backend lint/build + docker compose config doğrulaması
+
+## 10.1 EPIC-2 Eklenen API Uçları (İskelet)
+- `POST /api/v1/auth/otp/request`
+- `POST /api/v1/auth/otp/verify`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me` (auth required)
+- `GET /api/v1/admin/rbac-check` (role required)

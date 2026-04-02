@@ -71,3 +71,8 @@ Bu repoda başlangıç olarak analiz ve planlama dokümanları yer alır. Kod ge
 - `docker-compose.yml` : postgres + backend + frontend
 - `.env.example` : ortam değişkeni örneği
 - `.github/workflows/ci.yml` : backend lint/build + compose doğrulama
+
+## Aşama Takibi
+- [x] EPIC-1 tamamlandı
+- [x] EPIC-2 temel tamamlandı (Auth/OTP + RBAC)
+- [ ] EPIC-3 ve sonrası beklemede
