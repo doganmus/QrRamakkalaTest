@@ -5,6 +5,8 @@ Bu repo, iş sağlığı ve güvenliği (İSG) kapsamında saha personelinin QR 
 ## Dokümanlar
 - Ürün kapsamı, teknik mimari, ERD, API, wireframe listesi ve Jira planı:
   - `docs/project-plan.md`
+- GitHub Actions `npm ci` / merge engeli için hızlı çözüm rehberi:
+  - `docs/ci-npm-ci-fix.md`
 
 ## Proje Hedefi
 - Saha personelinin güvenli, hızlı ve düşük sürtünmeli şekilde bildirim yapması
