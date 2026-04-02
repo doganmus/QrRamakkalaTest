@@ -367,6 +367,7 @@
 ## 7.0 Aşama Takip Durumu
 - [x] **EPIC-1** Altyapı ve Proje Kurulumu (**Tamamlandı**)
 - [x] **EPIC-2** Kimlik ve Yetkilendirme temel iskelet (**Tamamlandı**)
+- [x] **EPIC-3** QR ve Lokasyon temel iskelet (**Tamamlandı**)
 - [ ] **EPIC-3** QR ve Lokasyon
 - [ ] **EPIC-4** Bildirim Formu
 - [ ] **EPIC-5** Medya Yönetimi
@@ -390,6 +391,7 @@ Durum: ✅ Tamamlandı (Auth/OTP + RBAC temel endpointleri eklendi)
 - ISG-12 Role modeli ve temel RBAC
 
 ## EPIC-3 QR ve Lokasyon
+Durum: ✅ Tamamlandı (Lokasyon CRUD + QR CRUD + Public QR doğrulama endpointleri eklendi)
 - ISG-20 Lokasyon CRUD
 - ISG-21 QR üretimi (token + PNG/SVG)
 - ISG-22 QR-Lokasyon eşleştirme
@@ -498,6 +500,8 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
   - İlk migration (users, roles, user_roles)
 - `db/migrations/002_auth_otp_rbac.sql`
   - OTP ve auth session tabloları (EPIC-2 hazırlığı)
+- `db/migrations/003_locations_qr.sql`
+  - Departman, lokasyon ve QR kod tabloları (EPIC-3)
 - `docker-compose.yml`
   - postgres + backend + frontend birlikte ayağa kaldırma
 - `.env.example`
@@ -511,3 +515,12 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/me` (auth required)
 - `GET /api/v1/admin/rbac-check` (role required)
+
+## 10.2 EPIC-3 Eklenen API Uçları (İskelet)
+- `GET /api/v1/locations`
+- `POST /api/v1/locations`
+- `PATCH /api/v1/locations/:id`
+- `GET /api/v1/qr-codes`
+- `POST /api/v1/qr-codes`
+- `PATCH /api/v1/qr-codes/:id/active`
+- `GET /api/v1/public/qr/:token`

@@ -75,4 +75,5 @@ Bu repoda başlangıç olarak analiz ve planlama dokümanları yer alır. Kod ge
 ## Aşama Takibi
 - [x] EPIC-1 tamamlandı
 - [x] EPIC-2 temel tamamlandı (Auth/OTP + RBAC)
-- [ ] EPIC-3 ve sonrası beklemede
+- [x] EPIC-3 temel tamamlandı (Lokasyon CRUD + QR CRUD + Public QR doğrulama)
+- [ ] EPIC-4 ve sonrası beklemede
