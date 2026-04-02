@@ -437,3 +437,54 @@ Onay verildiği gün itibarıyla:
 - **Hafta 8:** UAT, güvenlik/perf iyileştirme
 - **Hafta 9-10 (opsiyonel):** Faz-2 hazırlık veya pilot yayına geçiş
 
+---
+
+## 9) EPIC-1 Teknik Skeleton Sonrası Başlangıç Kararı
+
+Soru: “EPIC-1 (backend + frontend + db migration + docker-compose) tamamlandıktan sonra geliştirme başlayabilir miyiz?”  
+Cevap: **Evet, başlanabilir.** EPIC-1 tamamlandığında ekip paralel feature geliştirmeye geçebilir.
+
+### 9.1 Go/No-Go Checklist (EPIC-1 Çıkış Kriteri)
+- Backend skeleton çalışıyor (en az bir health endpoint ile)
+- Frontend skeleton çalışıyor (temel route ve layout)
+- DB migration altyapısı hazır, ilk migration uygulanabilir
+- Docker Compose ile tüm servisler local ortamda ayağa kalkıyor
+- `.env.example` ve setup dokümantasyonu mevcut
+- CI’de en az lint/build adımı başarılı
+
+### 9.2 EPIC-1 Sonrası İlk Teknik Adımlar
+1. EPIC-2 (Auth/OTP/RBAC) ve EPIC-3 (QR/Lokasyon) paralel başlatılır
+2. Public form akışı için minimum uçtan uca senaryo çıkarılır
+3. Loglama, hata izleme ve audit temel eventleri aktif edilir
+4. Sprint sonunda demo + UAT geri bildirim döngüsü işletilir
+
+### 9.3 Hâlâ Netleştirilmesi Faydalı Konular (Bloklayıcı Değil)
+- SMS ve WhatsApp sağlayıcılarının nihai seçimi
+- LDAP/AD erişim topolojisi ve güvenlik kuralları
+- KVKK saklama sürelerinin kurum içi son onayı
+- Pilot lokasyon, UAT kullanıcıları ve başarı metrikleri
+
+---
+
+## 10) EPIC-1 Teknik Skeleton Çıktıları (Repo Durumu)
+
+Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar oluşturulmuştur:
+
+- `backend/src/index.js`
+  - Express API skeleton
+  - `GET /api/v1/health` endpointi
+  - PostgreSQL bağlantı kontrolü
+- `backend/Dockerfile` ve `backend/package.json`
+  - Konteynerize backend koşumu
+  - lint/build scriptleri
+- `frontend/index.html` ve `frontend/nginx.conf`
+  - Minimal frontend iskeleti
+  - `/api/*` çağrıları için backend proxy
+- `db/migrations/001_init.sql`
+  - İlk migration (users, roles, user_roles)
+- `docker-compose.yml`
+  - postgres + backend + frontend birlikte ayağa kaldırma
+- `.env.example`
+  - Ortam değişkeni şablonu
+- `.github/workflows/ci.yml`
+  - Backend lint/build + docker compose config doğrulaması

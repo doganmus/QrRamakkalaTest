@@ -5,7 +5,7 @@ Bu repo, iş sağlığı ve güvenliği (İSG) kapsamında saha personelinin QR 
 ## Dokümanlar
 - Ürün kapsamı, teknik mimari, ERD, API, wireframe listesi ve Jira planı:
   - `docs/project-plan.md`
-- GitHub Actions `npm ci` / merge engeli için hızlı çözüm rehberi:
+- CI `npm ci` merge hatası ve çözüm notu:
   - `docs/ci-npm-ci-fix.md`
 
 ## Proje Hedefi
@@ -41,5 +41,33 @@ Detaylı planlama tamamlandığı için geliştirmeye **hemen başlanabilir**.
 4. Risk + workflow
 5. Admin panel + raporlama
 
+## EPIC-1 Tamamlandıktan Sonra Başlangıç
+Evet, doğrudan başlanabilir. Özellikle teknik skeleton (backend + frontend + db migration + docker-compose) tamamlanınca ekip paralel geliştirmeye güvenle geçebilir.
+
+EPIC-1 çıktı kontrol listesi:
+- Backend skeleton ve temel health endpoint
+- Frontend skeleton ve temel route yapısı
+- Veritabanı migration altyapısı (ilk migration ile)
+- Docker Compose ile tek komut local ayağa kaldırma
+- Ortam değişkenleri (`.env.example`) ve temel geliştirici dokümantasyonu
+- CI üzerinde en az lint/build kontrolü
+
+Bu checklist sağlandığında geliştirme bloklanmaz; feature geliştirmeleri EPIC-2 ve sonrası için başlatılabilir.
+
+## Geliştirme Öncesi Hâlâ Gerekli Mi?
+Zorunlu olarak ek bir analiz dokümanı gerekmiyor. Ancak riski düşürmek için aşağıdakiler önerilir:
+- SMS/WhatsApp sağlayıcılarının kesin seçimi
+- LDAP/AD entegrasyon sınırlarının netleştirilmesi
+- KVKK saklama sürelerinin kurum politikası ile doğrulanması
+- Pilot lokasyon ve UAT sorumlularının belirlenmesi
+
 ## Not
 Bu repoda başlangıç olarak analiz ve planlama dokümanları yer alır. Kod geliştirme fazı için backlog `docs/project-plan.md` içindeki Jira planına göre yürütülmelidir.
+
+## EPIC-1 Teknik Skeleton (Bu Repoda Oluşturuldu)
+- `backend/` : Express tabanlı API skeleton + `/api/v1/health`
+- `frontend/` : Nginx ile servis edilen minimal arayüz
+- `db/migrations/001_init.sql` : ilk migration (users/roles/user_roles)
+- `docker-compose.yml` : postgres + backend + frontend
+- `.env.example` : ortam değişkeni örneği
+- `.github/workflows/ci.yml` : backend lint/build + compose doğrulama
