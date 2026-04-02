@@ -337,6 +337,127 @@ app.get("/api/v1/public/qr/:token", async (req, res) => {
   }
 });
 
+app.get("/api/v1/public/incident-types", async (_req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, code, name
+       FROM incident_types
+       WHERE is_active = TRUE
+       ORDER BY id`
+    );
+    return res.json(result.rows);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to list incident types", error: error.message });
+  }
+});
+
+app.post("/api/v1/public/reports", async (req, res) => {
+  const {
+    qrToken,
+    incidentTypeCodes,
+    description,
+    hasInjury = false,
+    needsEmergency = false,
+    gpsLat = null,
+    gpsLng = null,
+    reporterMode = "ANONYMOUS",
+    reporterPhoneMasked = null
+  } = req.body || {};
+
+  if (!qrToken) {
+    return res.status(400).json({ message: "qrToken is required" });
+  }
+
+  if (!Array.isArray(incidentTypeCodes) || incidentTypeCodes.length < 1) {
+    return res.status(400).json({ message: "incidentTypeCodes must include at least one type" });
+  }
+
+  if (!description || description.trim().length < 20) {
+    return res.status(400).json({ message: "description must be at least 20 characters" });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const qrResult = await client.query(
+      `SELECT q.id, q.is_active, l.id AS location_id, l.is_active AS location_active
+       FROM qr_codes q
+       JOIN locations l ON l.id = q.location_id
+       WHERE q.token = $1
+       LIMIT 1`,
+      [qrToken]
+    );
+
+    if (qrResult.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "QR not found" });
+    }
+
+    const qr = qrResult.rows[0];
+    if (!qr.is_active || !qr.location_active) {
+      await client.query("ROLLBACK");
+      return res.status(410).json({ message: "QR inactive" });
+    }
+
+    const incidentTypesResult = await client.query(
+      `SELECT id, code
+       FROM incident_types
+       WHERE is_active = TRUE AND code = ANY($1::text[])`,
+      [incidentTypeCodes]
+    );
+
+    if (incidentTypesResult.rowCount !== incidentTypeCodes.length) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ message: "One or more incident type codes are invalid" });
+    }
+
+    const reportResult = await client.query(
+      `INSERT INTO reports
+         (qr_code_id, location_id, reporter_mode, reporter_phone_masked, description, has_injury, needs_emergency, gps_lat, gps_lng, status_code)
+       VALUES
+         ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'NEW')
+       RETURNING id, qr_code_id, location_id, reporter_mode, description, has_injury, needs_emergency, gps_lat, gps_lng, status_code, reported_at`,
+      [
+        qr.id,
+        qr.location_id,
+        reporterMode,
+        reporterPhoneMasked,
+        description.trim(),
+        Boolean(hasInjury),
+        Boolean(needsEmergency),
+        gpsLat,
+        gpsLng
+      ]
+    );
+
+    const report = reportResult.rows[0];
+
+    for (const incidentType of incidentTypesResult.rows) {
+      await client.query(
+        `INSERT INTO report_incident_types (report_id, incident_type_id)
+         VALUES ($1, $2)`,
+        [report.id, incidentType.id]
+      );
+    }
+
+    await client.query("COMMIT");
+    return res.status(201).json({
+      reportId: report.id,
+      status: report.status_code,
+      qrCodeId: report.qr_code_id,
+      locationId: report.location_id,
+      incidentTypes: incidentTypesResult.rows.map((item) => item.code),
+      reportedAt: report.reported_at
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    return res.status(500).json({ message: "Failed to create report", error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
 app.listen(port, () => {
   console.log(`Backend listening on port ${port}`);
 });

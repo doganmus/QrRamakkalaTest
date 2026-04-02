@@ -368,6 +368,7 @@
 - [x] **EPIC-1** Altyapı ve Proje Kurulumu (**Tamamlandı**)
 - [x] **EPIC-2** Kimlik ve Yetkilendirme temel iskelet (**Tamamlandı**)
 - [x] **EPIC-3** QR ve Lokasyon temel iskelet (**Tamamlandı**)
+- [x] **EPIC-4** Bildirim Formu temel iskelet (**Tamamlandı**)
 - [ ] **EPIC-3** QR ve Lokasyon
 - [ ] **EPIC-4** Bildirim Formu
 - [ ] **EPIC-5** Medya Yönetimi
@@ -398,6 +399,7 @@ Durum: ✅ Tamamlandı (Lokasyon CRUD + QR CRUD + Public QR doğrulama endpointl
 - ISG-23 QR doğrulama public endpoint
 
 ## EPIC-4 Bildirim Formu
+Durum: ✅ Tamamlandı (Public report endpoint + olay türü validasyonu + GPS/QR lokasyon kaydı eklendi)
 - ISG-30 Public form endpoint
 - ISG-31 Olay türü çoklu seçim validasyonu
 - ISG-32 Zorunlu alan validasyonları
@@ -502,6 +504,8 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
   - OTP ve auth session tabloları (EPIC-2 hazırlığı)
 - `db/migrations/003_locations_qr.sql`
   - Departman, lokasyon ve QR kod tabloları (EPIC-3)
+- `db/migrations/004_reports_incidents.sql`
+  - Olay türleri, bildirim ana tablosu ve bildirim-olay türü ilişki tablosu (EPIC-4)
 - `docker-compose.yml`
   - postgres + backend + frontend birlikte ayağa kaldırma
 - `.env.example`
@@ -524,3 +528,7 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
 - `POST /api/v1/qr-codes`
 - `PATCH /api/v1/qr-codes/:id/active`
 - `GET /api/v1/public/qr/:token`
+
+## 10.3 EPIC-4 Eklenen API Uçları (İskelet)
+- `GET /api/v1/public/incident-types`
+- `POST /api/v1/public/reports`
