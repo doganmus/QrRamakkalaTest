@@ -369,6 +369,8 @@
 - [x] **EPIC-2** Kimlik ve Yetkilendirme temel iskelet (**Tamamlandı**)
 - [x] **EPIC-3** QR ve Lokasyon temel iskelet (**Tamamlandı**)
 - [x] **EPIC-4** Bildirim Formu temel iskelet (**Tamamlandı**)
+- [ ] **EPIC-3** QR ve Lokasyon
+- [ ] **EPIC-4** Bildirim Formu
 - [ ] **EPIC-5** Medya Yönetimi
 - [ ] **EPIC-6** Risk ve Workflow
 - [ ] **EPIC-7** DÖF ve Bildirimler

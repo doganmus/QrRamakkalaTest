@@ -78,3 +78,4 @@ Bu repoda başlangıç olarak analiz ve planlama dokümanları yer alır. Kod ge
 - [x] EPIC-3 temel tamamlandı (Lokasyon CRUD + QR CRUD + Public QR doğrulama)
 - [x] EPIC-4 temel tamamlandı (Public report endpoint + olay türü validasyonları + GPS/QR lokasyon kaydı)
 - [ ] EPIC-5 ve sonrası beklemede
+- [ ] EPIC-4 ve sonrası beklemede
