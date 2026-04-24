@@ -539,3 +539,9 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
 - `PUT /api/v1/media-rules/:incidentTypeCode`
 - `POST /api/v1/public/reports/:id/media/presign`
 - `POST /api/v1/public/reports/:id/media/complete`
+
+## 11) PR Çakışma Önleme İyileştirmeleri
+- [x] `.env.example` için `merge=union` kuralı eklendi (`.gitattributes`).
+- [x] CI'ya conflict marker kontrol adımı eklendi (`no-conflict-markers`).
+- [x] Operasyon rehberi eklendi (`docs/merge-conflict-onleme.md`).
+- [x] EPIC-6 bu adımda **bilinçli olarak beklemede** bırakıldı.

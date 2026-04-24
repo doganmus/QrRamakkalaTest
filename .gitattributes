@@ -1,0 +1,2 @@
+# Auto-merge env example by keeping both sides when possible.
+.env.example merge=union

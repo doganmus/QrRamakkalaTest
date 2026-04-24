@@ -7,6 +7,8 @@ Bu repo, iş sağlığı ve güvenliği (İSG) kapsamında saha personelinin QR 
   - `docs/project-plan.md`
 - CI `npm ci` merge hatası ve çözüm notu:
   - `docs/ci-npm-ci-fix.md`
+- PR merge conflict önleme rehberi:
+  - `docs/merge-conflict-onleme.md`
 
 ## Proje Hedefi
 - Saha personelinin güvenli, hızlı ve düşük sürtünmeli şekilde bildirim yapması
