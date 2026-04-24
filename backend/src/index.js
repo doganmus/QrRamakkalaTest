@@ -9,6 +9,7 @@ const otpTtlSeconds = Number(process.env.OTP_TTL_SECONDS || 300);
 const sessionTtlSeconds = Number(process.env.SESSION_TTL_SECONDS || 86400);
 const adminEmail = process.env.ADMIN_EMAIL || "admin@isg.local";
 const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
+const mediaUploadBaseUrl = process.env.MEDIA_UPLOAD_BASE_URL || "http://localhost:9000/isg-media";
 
 app.use(cors());
 app.use(express.json());
@@ -455,6 +456,167 @@ app.post("/api/v1/public/reports", async (req, res) => {
     return res.status(500).json({ message: "Failed to create report", error: error.message });
   } finally {
     client.release();
+  }
+});
+
+app.get("/api/v1/media-rules", authRequired, isAdminOrExpert, async (_req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT mr.id, it.code AS incident_type_code, it.name AS incident_type_name,
+              mr.photo_required, mr.video_allowed, mr.max_video_seconds, mr.max_file_size_mb
+       FROM media_rules mr
+       JOIN incident_types it ON it.id = mr.incident_type_id
+       ORDER BY it.id`
+    );
+    return res.json(result.rows);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to list media rules", error: error.message });
+  }
+});
+
+app.put("/api/v1/media-rules/:incidentTypeCode", authRequired, roleRequired(["SUPER_ADMIN"]), async (req, res) => {
+  const incidentTypeCode = req.params.incidentTypeCode;
+  const { photoRequired, videoAllowed, maxVideoSeconds, maxFileSizeMb } = req.body || {};
+
+  try {
+    const incidentTypeResult = await pool.query(
+      `SELECT id FROM incident_types WHERE code = $1 LIMIT 1`,
+      [incidentTypeCode]
+    );
+    if (incidentTypeResult.rowCount === 0) {
+      return res.status(404).json({ message: "incident type not found" });
+    }
+
+    const incidentTypeId = incidentTypeResult.rows[0].id;
+    const result = await pool.query(
+      `UPDATE media_rules
+       SET photo_required = COALESCE($2, photo_required),
+           video_allowed = COALESCE($3, video_allowed),
+           max_video_seconds = COALESCE($4, max_video_seconds),
+           max_file_size_mb = COALESCE($5, max_file_size_mb),
+           updated_at = NOW()
+       WHERE incident_type_id = $1
+       RETURNING id, incident_type_id, photo_required, video_allowed, max_video_seconds, max_file_size_mb`,
+      [incidentTypeId, photoRequired ?? null, videoAllowed ?? null, maxVideoSeconds ?? null, maxFileSizeMb ?? null]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "media rule not found" });
+    }
+    return res.json(result.rows[0]);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update media rule", error: error.message });
+  }
+});
+
+app.post("/api/v1/public/reports/:id/media/presign", async (req, res) => {
+  const reportId = Number(req.params.id);
+  const {
+    mediaType,
+    mimeType,
+    fileSizeBytes,
+    durationSeconds = null
+  } = req.body || {};
+
+  if (!reportId) {
+    return res.status(400).json({ message: "invalid report id" });
+  }
+  if (!["PHOTO", "VIDEO"].includes(mediaType)) {
+    return res.status(400).json({ message: "mediaType must be PHOTO or VIDEO" });
+  }
+  if (!fileSizeBytes || Number(fileSizeBytes) <= 0) {
+    return res.status(400).json({ message: "fileSizeBytes must be > 0" });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const reportResult = await client.query(`SELECT id FROM reports WHERE id = $1 LIMIT 1`, [reportId]);
+    if (reportResult.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ message: "report not found" });
+    }
+
+    const rulesResult = await client.query(
+      `SELECT COALESCE(MIN(mr.max_file_size_mb), 25) AS max_file_size_mb,
+              COALESCE(MIN(mr.max_video_seconds), 30) AS max_video_seconds,
+              COALESCE(BOOL_AND(mr.video_allowed), TRUE) AS video_allowed
+       FROM report_incident_types rit
+       JOIN media_rules mr ON mr.incident_type_id = rit.incident_type_id
+       WHERE rit.report_id = $1`,
+      [reportId]
+    );
+    const rules = rulesResult.rows[0];
+    const maxBytes = Number(rules.max_file_size_mb) * 1024 * 1024;
+
+    if (Number(fileSizeBytes) > maxBytes) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ message: `File too large. Max ${rules.max_file_size_mb} MB` });
+    }
+
+    if (mediaType === "VIDEO") {
+      if (!rules.video_allowed) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({ message: "Video is not allowed for selected incident type(s)" });
+      }
+      if (durationSeconds && Number(durationSeconds) > Number(rules.max_video_seconds)) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({ message: `Video too long. Max ${rules.max_video_seconds} seconds` });
+      }
+    }
+
+    const objectKey = `${reportId}/${Date.now()}-${generateToken()}`;
+    const mediaInsert = await client.query(
+      `INSERT INTO report_media
+         (report_id, media_type, object_key, file_size_bytes, mime_type, duration_seconds, upload_status)
+       VALUES
+         ($1, $2, $3, $4, $5, $6, 'PENDING')
+       RETURNING id, object_key, upload_status`,
+      [reportId, mediaType, objectKey, fileSizeBytes, mimeType || null, durationSeconds || null]
+    );
+
+    await client.query("COMMIT");
+    const media = mediaInsert.rows[0];
+    return res.json({
+      mediaId: media.id,
+      objectKey: media.object_key,
+      uploadUrl: `${mediaUploadBaseUrl}/${media.object_key}`,
+      method: "PUT",
+      requiredHeaders: {
+        "Content-Type": mimeType || "application/octet-stream"
+      }
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    return res.status(500).json({ message: "Failed to create presign", error: error.message });
+  } finally {
+    client.release();
+  }
+});
+
+app.post("/api/v1/public/reports/:id/media/complete", async (req, res) => {
+  const reportId = Number(req.params.id);
+  const { mediaId, thumbnailKey = null } = req.body || {};
+  if (!reportId || !mediaId) {
+    return res.status(400).json({ message: "report id and mediaId are required" });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE report_media
+       SET upload_status = 'COMPLETED',
+           thumbnail_key = COALESCE($3, thumbnail_key),
+           completed_at = NOW()
+       WHERE id = $1 AND report_id = $2
+       RETURNING id, report_id, media_type, object_key, thumbnail_key, upload_status, completed_at`,
+      [mediaId, reportId, thumbnailKey]
+    );
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "media not found" });
+    }
+    return res.json(result.rows[0]);
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to complete upload", error: error.message });
   }
 });
 

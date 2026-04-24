@@ -7,6 +7,8 @@ Bu repo, iş sağlığı ve güvenliği (İSG) kapsamında saha personelinin QR 
   - `docs/project-plan.md`
 - CI `npm ci` merge hatası ve çözüm notu:
   - `docs/ci-npm-ci-fix.md`
+- PR merge conflict önleme rehberi:
+  - `docs/merge-conflict-onleme.md`
 
 ## Proje Hedefi
 - Saha personelinin güvenli, hızlı ve düşük sürtünmeli şekilde bildirim yapması
@@ -77,5 +79,5 @@ Bu repoda başlangıç olarak analiz ve planlama dokümanları yer alır. Kod ge
 - [x] EPIC-2 temel tamamlandı (Auth/OTP + RBAC)
 - [x] EPIC-3 temel tamamlandı (Lokasyon CRUD + QR CRUD + Public QR doğrulama)
 - [x] EPIC-4 temel tamamlandı (Public report endpoint + olay türü validasyonları + GPS/QR lokasyon kaydı)
-- [ ] EPIC-5 ve sonrası beklemede
-- [ ] EPIC-4 ve sonrası beklemede
+- [x] EPIC-5 temel tamamlandı (Medya kural yönetimi + upload presign/complete akışı)
+- [ ] EPIC-6 ve sonrası beklemede

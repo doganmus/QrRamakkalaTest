@@ -369,9 +369,7 @@
 - [x] **EPIC-2** Kimlik ve Yetkilendirme temel iskelet (**Tamamlandı**)
 - [x] **EPIC-3** QR ve Lokasyon temel iskelet (**Tamamlandı**)
 - [x] **EPIC-4** Bildirim Formu temel iskelet (**Tamamlandı**)
-- [ ] **EPIC-3** QR ve Lokasyon
-- [ ] **EPIC-4** Bildirim Formu
-- [ ] **EPIC-5** Medya Yönetimi
+- [x] **EPIC-5** Medya Yönetimi temel iskelet (**Tamamlandı**)
 - [ ] **EPIC-6** Risk ve Workflow
 - [ ] **EPIC-7** DÖF ve Bildirimler
 - [ ] **EPIC-8** Dashboard ve Raporlama
@@ -407,6 +405,7 @@ Durum: ✅ Tamamlandı (Public report endpoint + olay türü validasyonu + GPS/Q
 - ISG-34 GPS + QR lokasyon kaydı
 
 ## EPIC-5 Medya Yönetimi
+Durum: ✅ Tamamlandı (Medya kural yönetimi + presign/complete upload endpointleri eklendi)
 - ISG-40 MinIO entegrasyonu
 - ISG-41 Presigned upload akışı
 - ISG-42 Thumbnail üretimi
@@ -506,6 +505,8 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
   - Departman, lokasyon ve QR kod tabloları (EPIC-3)
 - `db/migrations/004_reports_incidents.sql`
   - Olay türleri, bildirim ana tablosu ve bildirim-olay türü ilişki tablosu (EPIC-4)
+- `db/migrations/005_media_management.sql`
+  - Medya kural tablosu ve bildirim medya tablosu (EPIC-5)
 - `docker-compose.yml`
   - postgres + backend + frontend birlikte ayağa kaldırma
 - `.env.example`
@@ -532,3 +533,15 @@ Bu plandaki EPIC-1 başlangıç hedefleri için aşağıdaki iskelet yapılar ol
 ## 10.3 EPIC-4 Eklenen API Uçları (İskelet)
 - `GET /api/v1/public/incident-types`
 - `POST /api/v1/public/reports`
+
+## 10.4 EPIC-5 Eklenen API Uçları (İskelet)
+- `GET /api/v1/media-rules`
+- `PUT /api/v1/media-rules/:incidentTypeCode`
+- `POST /api/v1/public/reports/:id/media/presign`
+- `POST /api/v1/public/reports/:id/media/complete`
+
+## 11) PR Çakışma Önleme İyileştirmeleri
+- [x] `.env.example` için `merge=union` kuralı eklendi (`.gitattributes`).
+- [x] CI'ya conflict marker kontrol adımı eklendi (`no-conflict-markers`).
+- [x] Operasyon rehberi eklendi (`docs/merge-conflict-onleme.md`).
+- [x] EPIC-6 bu adımda **bilinçli olarak beklemede** bırakıldı.
